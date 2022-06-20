@@ -45,7 +45,10 @@ function doPost(e) {
 	}
 
 	// コマンドに当てはまらなければ エラーを返す
-	let replyMessage = "投稿種別:" + messageType + "\n投稿内容:" + userMessage + "\nコマンド: スキップ,状況,クリア";
+	let replyMessage = "投稿種別:" + messageType + "\n投稿内容:" + userMessage
+		+ "\nコマンド: スキップ,状況,クリア"
+		+ "\nhttps://ambidata.io/bd/board.html?id=907"
+		+ "\n" + cmdGetStatus();
 	return replyLineMessage(replyMessage, replyToken);
 }
 
@@ -76,9 +79,10 @@ function cmdGetStatus() {
 	let alert_humidity = PropertiesService.getScriptProperties().getProperty("ALERT_HUMIDITY");
 	text += "監視閾値: " + alert_temperature + "℃ " + alert_humidity + "%";
 
-	let onhold_time = PropertiesService.getScriptProperties().getProperty("ONHOLD_TIME");
-	if (onhold_time != "") {
-		text += "\n監視停止期間: " + Utilities.formatDate(new Date(onhold_time), "JST", "M/d H:mmまで");
+	let time = checkObservationTime();
+	if (time.onhold == true) {
+		// スキップ中
+		text += "\n" + time.text;
 	} else {
 		text += "\n監視中";
 	}
@@ -106,7 +110,6 @@ function cmdClearOnholdTime() {
 	PropertiesService.getScriptProperties().setProperty("ONHOLD_TIME", "");
 	return "監視再開します";
 }
-
 
 // 監視をするか確認
 function checkObservationTime() {
