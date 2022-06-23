@@ -2,8 +2,8 @@ var SHEET_ID = "1XLHMUy269MObb6EPk6dzqYJrzYDVCId6BPAG8VV538U";
 
 //=================================== twitter
 //認証用インスタンスの生成
-const TWITTER_APIKEY = PropertiesService.getScriptProperties().getProperty("TWITTER_APIKEY");
-const TWITTER_SECRET = PropertiesService.getScriptProperties().getProperty("TWITTER_SECRET");
+var TWITTER_APIKEY = PropertiesService.getScriptProperties().getProperty("TWITTER_APIKEY");
+var TWITTER_SECRET = PropertiesService.getScriptProperties().getProperty("TWITTER_SECRET");
 var twitter = TwitterWebService.getInstance(
   TWITTER_APIKEY,//API Key
   TWITTER_SECRET//API secret key
