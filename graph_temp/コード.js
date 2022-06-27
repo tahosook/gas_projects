@@ -70,7 +70,7 @@ function getYesterday() {
 //=================================== MAIN
 function myFunction() {
   var yesterday = getYesterday();
-  //  yesterday = "2021-09-06";
+  //yesterday = "2022-06-21";
   var url = "https://ambidata.io/api/v2/channels/1140/data?readKey=f6ef7a046e8aee0a&date=" + yesterday;
   var options = {
     "method": "GET",
