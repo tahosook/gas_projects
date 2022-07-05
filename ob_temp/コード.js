@@ -65,10 +65,13 @@ function myFunction() {
 	console.log(ambi.text);
 
 	// 閾値(ALERT)を超えたら LINEに通知
+	let wbgt_simplified = Math.round((ambi.t - (100 - ambi.h) * 0.11) * 10) / 10;
 	let alert_temperature = PropertiesService.getScriptProperties().getProperty("ALERT_TEMPERATURE");
 	let alert_humidity = PropertiesService.getScriptProperties().getProperty("ALERT_HUMIDITY");
-	if (ambi.t > alert_temperature && ambi.h > alert_humidity) {
-		postLineMessage(ambi.text);
+	let alert_wbgt = PropertiesService.getScriptProperties().getProperty("ALERT_WBGT");
+	if (ambi.t > alert_temperature && ambi.h > alert_humidity || wbgt_simplified > alert_wbgt) {
+		console.log("WBGT=" + wbgt_simplified + " ALERT=" + alert_wbgt);
+		postLineMessage(ambi.text + " WBGT=" + wbgt_simplified);
 	}
 }
 
@@ -77,7 +80,8 @@ function cmdGetStatus() {
 	let text = "";
 	let alert_temperature = PropertiesService.getScriptProperties().getProperty("ALERT_TEMPERATURE");
 	let alert_humidity = PropertiesService.getScriptProperties().getProperty("ALERT_HUMIDITY");
-	text += "監視閾値: " + alert_temperature + "℃ " + alert_humidity + "%";
+	let alert_wbgt = PropertiesService.getScriptProperties().getProperty("ALERT_WBGT");
+	text += "監視閾値: " + alert_temperature + "℃ " + alert_humidity + "%\nWBGT=" + alert_wbgt;
 
 	let time = checkObservationTime();
 	if (time.onhold == true) {
