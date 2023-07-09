@@ -68,6 +68,11 @@ function myFunction() {
 	let alert_temperature = PropertiesService.getScriptProperties().getProperty("ALERT_TEMPERATURE");
 	let alert_humidity = PropertiesService.getScriptProperties().getProperty("ALERT_HUMIDITY");
 	let alert_wbgt = PropertiesService.getScriptProperties().getProperty("ALERT_WBGT");
+	let skip_wbgt = PropertiesService.getScriptProperties().getProperty("SKIP_WBGT");
+	if (ambi.wbgt < skip_wbgt) { // WBGT値が一定値よりも低ければ LINEメッセージしない
+		return;
+	}
+
 	if (ambi.t > alert_temperature || ambi.h > alert_humidity || ambi.wbgt > alert_wbgt) {
 		postLineMessage(ambi.text);
 	}
@@ -154,23 +159,39 @@ function checkAmbidata() {
 	let text = "";
 	let temperature = Math.round(sum_temperature / AMBI_COUNT * 10) / 10;
 	let humidity = Math.round(sum_humidity / AMBI_COUNT * 10) / 10;
-	text += '気温:' + temperature + "℃ 湿度=" + humidity + "%";
+	text += '気温:' + temperature + "℃ 湿度:" + humidity + "%";
 
 	// 簡易版WBGT計算(我流で計算式作成)
-	let wbgt_simplified = Math.round((temperature - (100 - humidity) * 0.11) * 10) / 10;
-	text += " WBGT=" + wbgt_simplified;
+	//let wbgt_simplified = Math.round((temperature - (100 - humidity) * 0.11) * 10) / 10;
+	//text += " " + wbgt_simplified + "wbgt";
+
+	// 簡易版WBGT計算(ChatGPT計算式作成)
+	let wbgt_chatgpt = calculateWBGT(temperature, humidity).toFixed(1);
+	text += " " + wbgt_chatgpt + "wbgt";
 
 	return {
 		t: temperature,
 		h: humidity,
-		wbgt: wbgt_simplified,
+		wbgt: wbgt_chatgpt,
 		text: text
 	};
+}
+
+// WBGT の簡易計算
+function calculateWBGT(temperature, humidity) {
+	var dewPoint = temperature - ((100 - humidity) / 5);
+	var wbgt = 0.7 * temperature + 0.2 * dewPoint;
+	return wbgt;
 }
 
 // 気温湿度をLINEに通知
 function postLineMessage(text) {
 	let lineUserid = PropertiesService.getScriptProperties().getProperty("LINE_USERID");
+
+	// LINEとの疎通確認の時などで postLineMessage を引数なしで実行してみる場合には 何かしらメッセージを入れておく
+	if (text == undefined) {
+		text = "empty message";
+	}
 
 	const URL = 'https://api.line.me/v2/bot/message/push';
 	const payload = {
