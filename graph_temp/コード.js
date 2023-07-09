@@ -1,27 +1,114 @@
-var SHEET_ID = "1XLHMUy269MObb6EPk6dzqYJrzYDVCId6BPAG8VV538U";
+var SHEET_ID = "1PL-dgdeebTgm6F1h6Anq6nsPundzuk3rBu7EQVnkYO0";
 
 //=================================== twitter
 //認証用インスタンスの生成
 var TWITTER_APIKEY = PropertiesService.getScriptProperties().getProperty("TWITTER_APIKEY");
 var TWITTER_SECRET = PropertiesService.getScriptProperties().getProperty("TWITTER_SECRET");
+
 var twitter = TwitterWebService.getInstance(
   TWITTER_APIKEY,//API Key
   TWITTER_SECRET//API secret key
 );
 
-//アプリを連携認証する
-function twitterAuthorize() {
-  twitter.authorize();
+function twitter_getService() {
+  twitter_pkceChallengeVerifier();
+  const userProps = PropertiesService.getUserProperties();
+  const scriptProps = PropertiesService.getScriptProperties();
+  return OAuth2.createService('twitter')
+    .setAuthorizationBaseUrl('https://twitter.com/i/oauth2/authorize')
+    .setTokenUrl('https://api.twitter.com/2/oauth2/token?code_verifier=' + userProps.getProperty("code_verifier"))
+    .setClientId(TWITTER_APIKEY)
+    .setClientSecret(TWITTER_SECRET)
+    .setCallbackFunction('twitter_authCallback')
+    .setPropertyStore(userProps)
+    .setScope('users.read tweet.read tweet.write offline.access')
+    .setParam('response_type', 'code')
+    .setParam('code_challenge_method', 'S256')
+    .setParam('code_challenge', userProps.getProperty("code_challenge"))
+    .setTokenHeaders({
+      'Authorization': 'Basic ' + Utilities.base64Encode(TWITTER_APIKEY + ':' + TWITTER_SECRET),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    })
 }
 
-//認証を解除する
-function twitterReset() {
-  twitter.reset();
+function twitter_authCallback(request) {
+  const service = twitter_getService();
+  const authorized = service.handleCallback(request);
+  if (authorized) {
+    return HtmlService.createHtmlOutput('Success!');
+  } else {
+    return HtmlService.createHtmlOutput('Denied.');
+  }
 }
 
-//認証後のコールバック
-function authCallback(request) {
-  return twitter.authCallback(request);
+function twitter_pkceChallengeVerifier() {
+  var userProps = PropertiesService.getUserProperties();
+  if (!userProps.getProperty("code_verifier")) {
+    var verifier = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+
+    for (var i = 0; i < 128; i++) {
+      verifier += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    var sha256Hash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, verifier)
+
+    var challenge = Utilities.base64Encode(sha256Hash)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+    userProps.setProperty("code_verifier", verifier)
+    userProps.setProperty("code_challenge", challenge)
+  }
+}
+
+function twitter_logRedirectUri() {
+  var service = twitter_getService();
+  Logger.log(service.getRedirectUri());
+}
+
+function twitter_Authorize() {
+  const service = twitter_getService();
+  if (service.hasAccess()) {
+    Logger.log("Already authorized");
+  } else {
+    const authorizationUrl = service.getAuthorizationUrl();
+    Logger.log('Open the following URL and re-run the script: %s', authorizationUrl);
+  }
+}
+
+function twitter_Reset() {
+  const service = twitter_getService();
+  service.reset();
+}
+
+function postTweet(status, chart1, chart2) {
+  var mediaIdStr1 = postTweetMediaUpload(chart1);
+  var mediaIdStr2 = postTweetMediaUpload(chart2);
+
+  var payload = {
+    text: status,
+    'media_ids': mediaIdStr1 + "," + mediaIdStr2,
+  }
+
+  var service = twitter_getService();
+  if (service.hasAccess()) {
+    var url = 'https://api.twitter.com/2/tweets';
+    var response = UrlFetchApp.fetch(url, {
+      method: 'POST',
+      'contentType': 'application/json',
+      headers: {
+        Authorization: 'Bearer ' + service.getAccessToken()
+      },
+      muteHttpExceptions: true,
+      payload: JSON.stringify(payload)
+    });
+    var result = JSON.parse(response.getContentText());
+    Logger.log(JSON.stringify(result, null, 2));
+  } else {
+    var authorizationUrl = service.getAuthorizationUrl();
+    Logger.log('Open the following URL and re-run the script: %s', authorizationUrl);
+  }
 }
 
 // media upload
@@ -40,8 +127,51 @@ function postTweetMediaUpload(chart) {
   return image_upload['media_id_string'];
 }
 
+// media upload
+function postTweetMediaUpload2(chart) {
+  var graph = Utilities.base64Encode(chart.getBlob().getBytes());
+  var payload = { 'media_data': graph };
+
+  var service = twitter.getService();
+  if (service.hasAccess()) {
+    Logger.log(service.getAccessToken());
+    var url = 'https://upload.twitter.com/1.1/media/upload.json';
+    var response = UrlFetchApp.fetch(url, {
+      method: 'POST',
+      'contentType': 'application/json',
+      headers: {
+        Authorization: 'Bearer ' + service.getAccessToken()
+      },
+      muteHttpExceptions: true,
+      payload: JSON.stringify(payload)
+    });
+    Logger.log(response.getContentText());
+    var result = JSON.parse(response.getContentText());
+    Logger.log(JSON.stringify(result, null, 2));
+  }
+  return result['media_id_string'];
+}
+
+
+
+// media upload
+function postTweetMediaUpload_old(chart) {
+  var service = twitter.getService();
+  var mediaUpload = 'https://upload.twitter.com/1.1/media/upload.json';
+
+  var graph = Utilities.base64Encode(chart.getBlob().getBytes());
+  var img_option = {
+    'method': "POST",
+    'payload': { 'media_data': graph }
+  };
+
+  var image_upload = JSON.parse(service.fetch(mediaUpload, img_option));
+
+  return image_upload['media_id_string'];
+}
+
 // ツイートを投稿
-function postTweet(status, chart1, chart2) {
+function postTweet_old(status, chart1, chart2) {
   var service = twitter.getService();
   var statusUpdate = 'https://api.twitter.com/1.1/statuses/update.json';
 
@@ -70,7 +200,7 @@ function getYesterday() {
 //=================================== MAIN
 function myFunction() {
   var yesterday = getYesterday();
-  // yesterday = "2022-06-26";
+  //yesterday = "2023-01-18";
   var url = "https://ambidata.io/api/v2/channels/1140/data?readKey=f6ef7a046e8aee0a&date=" + yesterday;
   var options = {
     "method": "GET",
@@ -158,5 +288,5 @@ function myFunction() {
     avgValues[0], avgValues[1], avgValues[2],
     "https://ambidata.io/ch/channel.html?id=1140");
   Logger.log(tweet);
-  postTweet(tweet, chart1, chart2);
+  //postTweet(tweet, chart1, chart2);
 }
