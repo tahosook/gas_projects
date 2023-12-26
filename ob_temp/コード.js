@@ -96,6 +96,16 @@ function cmdGetStatus() {
 	const ambi = checkAmbidata();
 	text += "\n" + ambi.text;
 
+	if (ambi.t > alertTemperature || ambi.h > alertHumidity || ambi.wbgt > alertWBGT) {
+		text += "\n" + "LINE通知対象 = " + ambi.t + ">" + alertTemperature
+			+ "||" + ambi.h + ">" + alertHumidity + "||" + ambi.wbgt + ">" + alertWBGT;
+
+		//debug
+		if (ambi.t > alertTemperature) text += "\n" + "temp";
+		if (ambi.h > alertHumidity) text += "\n" + "hum";
+		if (ambi.wbgt > alertWBGT) text += "\n" + "wbgt";
+	}
+
 	console.log(text);
 	return text;
 }
@@ -152,9 +162,9 @@ function checkAmbidata() {
 	const humidity = Math.round((sumHumidity / AMBI_COUNT) * 10) / 10;
 
 	// 簡易版WBGT計算(ChatGPT計算式作成)
-	const wbgt = calculateWBGT(temperature, humidity).toFixed(1);
+	const wbgt = calculateWBGT(temperature, humidity);
 
-	const text = '気温: ' + temperature + "℃ 湿度: " + humidity + "%" + " " + wbgt + "wbgt";
+	const text = '気温: ' + temperature + "℃ 湿度: " + humidity + "%" + " " + wbgt.toFixed(1) + "wbgt";
 
 	return {
 		t: temperature,
@@ -210,7 +220,11 @@ function replyLineMessage(replyMessage, replyToken) {
 
 // スクリプトプロパティを取得
 function getScriptProperty(propertyName) {
-	return PropertiesService.getScriptProperties().getProperty(propertyName);
+	const ret = PropertiesService.getScriptProperties().getProperty(propertyName);
+	if (propertyName.startsWith("ALERT") || propertyName.startsWith("SKIP")) {
+		return Number(ret);
+	}
+	return ret;
 }
 
 // スクリプトプロパティを設定
