@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.97",
+    "eslint": "^9.27.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}
