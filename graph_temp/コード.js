@@ -1,4 +1,4 @@
-var SHEET_ID = "1PL-dgdeebTgm6F1h6Anq6nsPundzuk3rBu7EQVnkYO0";
+var SHEET_ID = "115A9fS5N8dMXOZLusWEJg8wlH7FtOcYPHcBlscx-jk8";
 
 //=================================== twitter
 //認証用インスタンスの生成
@@ -83,10 +83,10 @@ function twitter_Reset() {
 }
 
 function postTweet(status, chart1, chart2) {
-  var mediaIdStr1 = postTweetMediaUpload(chart1);
+    var mediaIdStr1 = postTweetMediaUpload(chart1);
   var mediaIdStr2 = postTweetMediaUpload(chart2);
 
-  var payload = {
+    var payload = {
     text: status,
     'media_ids': mediaIdStr1 + "," + mediaIdStr2,
   }
@@ -107,7 +107,7 @@ function postTweet(status, chart1, chart2) {
     Logger.log(JSON.stringify(result, null, 2));
   } else {
     var authorizationUrl = service.getAuthorizationUrl();
-    Logger.log('Open the following URL and re-run the script: %s', authorizationUrl);
+    Logger.log('Open the following URL and re-run the script: %s',authorizationUrl);
   }
 }
 
@@ -133,7 +133,7 @@ function postTweetMediaUpload2(chart) {
   var payload = { 'media_data': graph };
 
   var service = twitter.getService();
-  if (service.hasAccess()) {
+  if (service.hasAccess()) {  
     Logger.log(service.getAccessToken());
     var url = 'https://upload.twitter.com/1.1/media/upload.json';
     var response = UrlFetchApp.fetch(url, {
@@ -200,7 +200,7 @@ function getYesterday() {
 //=================================== MAIN
 function myFunction() {
   var yesterday = getYesterday();
-  //yesterday = "2023-01-18";
+  //yesterday = "2025-01-05";
   var url = "https://ambidata.io/api/v2/channels/1140/data?readKey=f6ef7a046e8aee0a&date=" + yesterday;
   var options = {
     "method": "GET",
