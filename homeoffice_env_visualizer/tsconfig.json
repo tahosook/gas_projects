@@ -2,11 +2,11 @@
   "compilerOptions": {
     "target": "ES2019",
     "lib": ["ES2019"],
-    "types": ["google-apps-script"],
+    "types": ["google-apps-script","jest"],
     "strict": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "moduleResolution": "node",
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*.ts"]
 }
-

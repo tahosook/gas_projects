@@ -1,5 +1,3 @@
-import { hello } from '../src/main';
-
 class LoggerMock {
   lastLog = '';
   log(data: string) {
@@ -10,14 +8,16 @@ class LoggerMock {
   }
 }
 
+import '../src/main';
+
 describe('hello', () => {
   beforeEach(() => {
-    (global as any).Logger = new LoggerMock();
+    (globalThis as any).Logger = new LoggerMock();
   });
 
   it('ログと戻り値が正しいこと', () => {
-    const result = hello('GAS');
+    const result = (globalThis as any).hello('GAS');
     expect(result).toBe('Hello, GAS!');
-    expect((global as any).Logger.getLog()).toBe('Hello, GAS!');
+    expect((globalThis as any).Logger.getLog()).toBe('Hello, GAS!');
   });
 });

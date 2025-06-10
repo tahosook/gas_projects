@@ -1,17 +1,6 @@
 # すべて無視
-**/**
+#**/**
 
 # ただし、以下は含める
-!appsscript.json
-!src/**/*.gs
-!src/**/*.js
-!src/**/*.ts
-!src/**/*.html
-
-# 以下のディレクトリは無視
-node_modules/**
-.git/**
-.vscode/**
-custom_libraries/**
-dist/**
-
+!dist/appsscript.json
+!dist/*.js
