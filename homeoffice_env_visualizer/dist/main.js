@@ -1,4 +1,4 @@
-"use strict";
+import { getYesterday } from "./util";
 function hello(name) {
     Logger.log(`Hello, ${name}!`);
     return `Hello, ${name}!`;
