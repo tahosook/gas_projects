@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2019",
     "lib": ["ES2019"],
-    "types": ["google-apps-script","jest"],
+    "types": ["google-apps-script","jest","node"],
     "strict": true,
     "outDir": "dist",
     "rootDir": "src",

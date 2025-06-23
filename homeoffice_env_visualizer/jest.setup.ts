@@ -12,9 +12,11 @@
   fetch: (url: string): { getResponseCode: () => number; getContentText: () => string } => {
     // Mock response for testing
     if (url.includes("ambidata.io")) {
+      const fs = require('fs');
+      const data = fs.readFileSync('tests/ambidata_response.test.json', 'utf8');
       return {
         getResponseCode: () => 200,
-        getContentText: () => JSON.stringify({ data: "mocked data" })
+        getContentText: () => data
       };
     }
     throw new Error(`Mocked fetch failed for URL: ${url}`);

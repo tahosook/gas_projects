@@ -25,5 +25,19 @@ describe("Util Tests", () => {
     const json = await getAmbidataJson(channelId, readKey, date);
     expect(json).toBeDefined();
     expect(typeof json).toBe("object");
+
+    // Check the structure of the data
+    if (Array.isArray(json) && json.length > 0) {
+      const firstEntry = json[0];
+      expect(typeof firstEntry).toBe("object");
+      expect(firstEntry).toHaveProperty("d1");
+      expect(firstEntry).toHaveProperty("d2");
+      expect(firstEntry).toHaveProperty("d3");
+      expect(firstEntry).toHaveProperty("created");
+      expect(typeof firstEntry.d1).toBe("number");
+      expect(typeof firstEntry.d2).toBe("number");
+      expect(typeof firstEntry.d3).toBe("number");
+      expect(typeof firstEntry.created).toBe("string");
+    }
   });
 });
