@@ -1,4 +1,4 @@
-import { getAmbidataJson, getYesterday } from "./util";
+import { createNewSheet, getAmbidataJson, getYesterday } from "./util";
 
 function hello(name: string): string {
   Logger.log(`Hello, ${name}!`);
@@ -7,6 +7,7 @@ function hello(name: string): string {
 
 // main関数を定義
 function main(): void {
+  var SHEET_ID = "115A9fS5N8dMXOZLusWEJg8wlH7FtOcYPHcBlscx-jk8";
   var yesterday = getYesterday();
 
   var json = getAmbidataJson(
@@ -15,7 +16,7 @@ function main(): void {
     yesterday // 日付
   );
 
-  
+  createNewSheet(SHEET_ID, yesterday, json);
 }
 
 // globalThisに登録
