@@ -1,4 +1,4 @@
-import { getYesterday, getAmbidataJson } from "../src/util";
+import { getYesterday, getAmbidataJson, createNewSheet } from "../src/util";
 
 // test
 describe("Util Tests", () => {
@@ -39,5 +39,19 @@ describe("Util Tests", () => {
       expect(typeof firstEntry.d3).toBe("number");
       expect(typeof firstEntry.created).toBe("string");
     }
+  });
+
+  it("createNewSheet 関数がエラーを発生させずに実行されること", () => {
+    // テスト用の引数
+    const sheetId = "testSheetId";
+    const sheetName = "testSheetName";
+    const json = [{ created: "2025-01-01T00:00:00Z", d1: 1, d2: 2, d3: 3 }];
+
+    // createNewSheet 関数を呼び出す (実際には Google Apps Script の環境が必要)
+    // ここでは、関数が定義されていること、およびエラーが発生しないことを確認する
+    expect(() => {
+      // @ts-ignore
+      createNewSheet(sheetId, sheetName, json);
+    }).not.toThrow();
   });
 });

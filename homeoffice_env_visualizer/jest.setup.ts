@@ -8,6 +8,74 @@
   }
 };
 
+(globalThis as any).Charts = {
+  ChartType: {
+    LINE: 'LINE'
+  }
+};
+
+(globalThis as any).SpreadsheetApp = {
+  openById: (id: string) => {
+    return {
+      getSheets: () => {
+        return [{
+          getName: () => "Sheet1",
+          getDataRange: () => {
+            return {
+              getValues: () => {
+                return [["header1", "header2"], ["value1", "value2"]];
+              }
+            };
+          },
+          getLastRow: () => {
+            return 2;
+          },
+          appendRow: (row: any[]) => { },
+          deleteSheet: () => {}
+        }];
+      },
+      getSheetByName: (name: string) => {
+        return null;
+      },
+      insertSheet: (sheetName: string) => {
+        return {
+          setName: (name: string) => { },
+          getDataRange: () => {
+            return {
+              getValues: () => {
+                return [["header1", "header2"], ["value1", "value2"]];
+              },
+              setValues: (values: any[][]) => { }
+            };
+          },
+          appendRow: (row: any[]) => { },
+          getLastRow: () => {
+            return 2;
+          },
+          getRange: (row: number, column: number, numRows: number, numColumns: number) => {
+            return {
+              setValues: (values: any[][]) => { },
+              getValue: () => 0, // Mock value for average/min calculations
+            };
+          },
+          newChart: () => {
+            return {
+              addRange: function (range: any) { return this; },
+              setPosition: function (row: number, column: number, offsetX: number, offsetY: number) { return this; },
+              setChartType: function (type: string) { return this; },
+              setOption: function (option: string, value: any) { return this; },
+              build: () => ({})
+            };
+          },
+          insertChart: (chart: any) => { },
+          insertRowAfter: (row: number) => { }
+        };
+      },
+
+    };
+  }
+};
+
 (globalThis as any).UrlFetchApp = {
   fetch: (url: string): { getResponseCode: () => number; getContentText: () => string } => {
     // Mock response for testing
