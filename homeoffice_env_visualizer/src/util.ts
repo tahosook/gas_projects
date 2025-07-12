@@ -14,7 +14,7 @@ export function getYesterday(){
 
 // Fetches JSON data from ambidata.io for a given channel and date.
 export function getAmbidataJson(channelId: string, readKey: string, date: string) {
-    const url = `https://ambidata.io/api/v2/channels/${channelId}/data?read_key=${readKey}&date=${date}`;
+    const url = `https://ambidata.io/api/v2/channels/${channelId}/data?readKey=${readKey}&date=${date}`;
     const response = UrlFetchApp.fetch(url);
     if (response.getResponseCode() !== 200) {
         throw new Error(`Failed to fetch data from ambidata.io: ${response.getContentText()}`);

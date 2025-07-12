@@ -1,9 +1,5 @@
+declare const global: any;
 import { createNewSheet, getAmbidataJson, getYesterday } from "./util";
-
-function hello(name: string): string {
-  Logger.log(`Hello, ${name}!`);
-  return `Hello, ${name}!`;
-}
 
 // main関数を定義
 function main(): void {
@@ -21,5 +17,5 @@ function main(): void {
   createNewSheet(SHEET_ID, yesterday, json);
 }
 
-// globalThisに登録
-(globalThis as any).hello = hello;
+// main関数をグローバルに公開する
+global.main = main;

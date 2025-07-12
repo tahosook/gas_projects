@@ -6,7 +6,7 @@
     "strict": true,
     "outDir": "dist",
     "rootDir": "src",
-    "moduleResolution": "node",
+    "module": "none",
   },
   "include": ["src/**/*.ts"]
 }
