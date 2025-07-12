@@ -194,9 +194,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 // main関数を定義
 function main() {
-    var SHEET_ID = "115A9fS5N8dMXOZLusWEJg8wlH7FtOcYPHcBlscx-jk8";
-    var AMBIDATA_CHANNEL_ID = "1140"; // チャンネルID
-    var AMBIDATA_READ_KEY = "f6ef7a046e8aee0a"; // 読み取りキー
+    const scriptProperties = PropertiesService.getScriptProperties();
+    const SHEET_ID = scriptProperties.getProperty("SHEET_ID");
+    const AMBIDATA_CHANNEL_ID = scriptProperties.getProperty("AMBIDATA_CHANNEL_ID"); // チャンネルID
+    const AMBIDATA_READ_KEY = scriptProperties.getProperty("AMBIDATA_READ_KEY"); // 読み取りキー
+    if (!SHEET_ID || !AMBIDATA_CHANNEL_ID || !AMBIDATA_READ_KEY) {
+        throw new Error("スクリプトプロパティが設定されていません。");
+    }
     var yesterday = (0, util_1.getYesterday)();
     var json = (0, util_1.getAmbidataJson)(AMBIDATA_CHANNEL_ID, // チャンネルID
     AMBIDATA_READ_KEY, // 読み取りキー
